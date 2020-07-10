@@ -1,6 +1,14 @@
 # Create a class to hold a city location. Call the class "City". It should have
 # fields for name, lat and lon (representing latitude and longitude).
 
+class City:
+    def __init__(self, name, lat, lon):
+        self.name = name
+        self.lat = lat
+        self.lon = lon
+
+    def __str__(self):
+        return f"{self.name}, {self.lat}, {self.lon}"
 
 # We have a collection of US cities with population over 750,000 stored in the
 # file "cities.csv". (CSV stands for "comma-separated values".)
@@ -14,13 +22,20 @@
 #
 # Note that the first line of the CSV is header that describes the fields--this
 # should not be loaded into a City object.
+import csv
+
 cities = []
 
 def cityreader(cities=[]):
-  # TODO Implement the functionality to read from the 'cities.csv' file
-  # For each city record, create a new City instance and add it to the 
-  # `cities` list
-    
+    with open("cities.csv") as f:
+        csvreader = csv.reader(f)
+        # skip the first row
+        header = next(csvreader)
+        name_col = header.index("city")
+        lat_col = header.index("lat")
+        lon_col = header.index("lng")
+        for row in csvreader:
+            cities.append(City(row[name_col], float(row[lat_col]), float(row[lon_col])))
     return cities
 
 cityreader(cities)
@@ -58,14 +73,24 @@ for c in cities:
 # Tucson: (32.1558,-110.8777)
 # Salt Lake City: (40.7774,-111.9301)
 
-# TODO Get latitude and longitude values from the user
-
 def cityreader_stretch(lat1, lon1, lat2, lon2, cities=[]):
+  lower_lat = min(float(lat1), float(lat2))
+  lower_lon = min(float(lon1), float(lon2))
+  upper_lat = max(float(lat1), float(lat2))
+  upper_lon = max(float(lon1), float(lon2))
+
   # within will hold the cities that fall within the specified region
   within = []
 
-  # TODO Ensure that the lat and lon valuse are all floats
-  # Go through each city and check to see if it falls within 
-  # the specified coordinates.
+  for city in cities:
+      if city.lat > lower_lat and city.lat < upper_lat and city.lon > lower_lon and city.lon < upper_lon:
+          within.append(city)
 
   return within
+
+if __name__ == "__main__":
+    first_coord = input("input first coord (lat and lon separated by space): ").split()
+    second_coord = input("input second coord (lat and lon separated by space): ").split()
+    in_range = cityreader_stretch(first_coord[0], first_coord[1], second_coord[0], second_coord[1], cities)
+    for city in in_range:
+        print(city)
